@@ -23,6 +23,11 @@ fn main() {
     let mut game = Game::new();
 
     // game setup
+    game.window_settings(WindowDescriptor {
+        title: "Rusty Engine Tutorial".to_string(),
+        ..Default::default()
+    });
+
     game.audio_manager
         .play_music("music/Mysterious Magic.ogg", 0.1);
 
