@@ -27,6 +27,11 @@ fn main() {
     player.rotation = SOUTH_WEST;
     player.scale = 1.0;
     player.layer = 1.0;
+    player.collision = true;
+
+    let car1 = game.add_sprite("car1", "sprite/racing/car_yellow.png");
+    car1.translation = Vec2::new(300.0, 0.0);
+    car1.collision = true;
 
     // can add multiple game logic functions, ran in order added
     game.add_logic(game_logic);
@@ -34,7 +39,19 @@ fn main() {
 }
 
 fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
-    // game logic
-    // println!("Current Score: {}", game_state.current_score);
-    game_state.current_score += 1;
+    // engine.show_colliders = true;
+    for event in engine.collision_events.drain(..) {
+        println!("{:?}", event);
+        if event.state == CollisionState::Begin && event.pair.one_starts_with("player") {
+            for label in [event.pair.0, event.pair.1].iter() {
+                if label != "player" {
+                    engine.sprites.remove(label);
+                }
+            }
+            game_state.current_score += 1;
+            println!("Score: {}", game_state.current_score);
+        }
+    }
+    let player = engine.sprites.get_mut("player").unwrap();
+    player.translation.x += 100.0 * engine.delta_f32;
 }
