@@ -1,19 +1,19 @@
 use rusty_engine::prelude::*;
 
 struct GameState {
-    high_score: u32,
+    // high_score: u32,
     current_score: u32,
-    enemy_labels: Vec<String>,
-    spawn_timer: Timer,
+    barrier_index: i32,
+    // spawn_timer: Timer,
 }
 
 impl Default for GameState {
     fn default() -> Self {
         Self {
-            high_score: 0,
+            // high_score: 0,
             current_score: 0,
-            enemy_labels: Vec::new(),
-            spawn_timer: Timer::from_seconds(1.0, false),
+            barrier_index: 0,
+            // spawn_timer: Timer::from_seconds(1.0, false),
         }
     }
 }
@@ -29,10 +29,6 @@ fn main() {
     player.layer = 1.0;
     player.collision = true;
 
-    let car1 = game.add_sprite("car1", "sprite/racing/car_yellow.png");
-    car1.translation = Vec2::new(300.0, 0.0);
-    car1.collision = true;
-
     // can add multiple game logic functions, ran in order added
     game.add_logic(game_logic);
     game.run(GameState::default());
@@ -41,7 +37,7 @@ fn main() {
 fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
     // engine.show_colliders = true;
     for event in engine.collision_events.drain(..) {
-        println!("{:?}", event);
+        // println!("{:?}", event);
         if event.state == CollisionState::Begin && event.pair.one_starts_with("player") {
             for label in [event.pair.0, event.pair.1].iter() {
                 if label != "player" {
@@ -52,6 +48,8 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
             println!("Score: {}", game_state.current_score);
         }
     }
+
+    // player movement
     let player = engine.sprites.get_mut("player").unwrap();
     // player.translation.x += 100.0 * engine.delta_f32;
     const MOVE_SPEED: f32 = 100.0;
@@ -78,5 +76,16 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
         .pressed_any(&[KeyCode::Left, KeyCode::A])
     {
         player.translation.x -= MOVE_SPEED * engine.delta_f32;
+    }
+
+    // barrier placement
+    if engine.mouse_state.just_pressed(MouseButton::Left) {
+        if let Some(mouse_location) = engine.mouse_state.location() {
+            let label = format!("barrier{}", game_state.barrier_index);
+            game_state.barrier_index += 1;
+            let barrieri = engine.add_sprite(label, "sprite/racing/barrier_white.png");
+            barrieri.translation = mouse_location;
+            barrieri.collision = true;
+        }
     }
 }
