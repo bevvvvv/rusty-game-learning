@@ -1,10 +1,11 @@
+use rand::prelude::*;
 use rusty_engine::prelude::*;
 
 struct GameState {
     high_score: u32,
     score: u32,
     barrier_index: i32,
-    // spawn_timer: Timer,
+    spawn_timer: Timer,
 }
 
 impl Default for GameState {
@@ -13,7 +14,7 @@ impl Default for GameState {
             high_score: 0,
             score: 0,
             barrier_index: 0,
-            // spawn_timer: Timer::from_seconds(1.0, false),
+            spawn_timer: Timer::from_seconds(2.0, true),
         }
     }
 }
@@ -108,6 +109,18 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
             barrieri.translation = mouse_location;
             barrieri.collision = true;
         }
+    }
+
+    // spawner
+    if game_state.spawn_timer.tick(engine.delta).just_finished() {
+        let label = format!("barrier{}", game_state.barrier_index);
+        game_state.barrier_index += 1;
+        let barrieri = engine.add_sprite(label, "sprite/racing/barrier_white.png");
+        barrieri.translation = Vec2::new(
+            thread_rng().gen_range(-550.0..550.0),
+            thread_rng().gen_range(-325.0..325.0),
+        );
+        barrieri.collision = true;
     }
 
     // reset score
