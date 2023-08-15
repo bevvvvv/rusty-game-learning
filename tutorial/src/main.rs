@@ -47,6 +47,20 @@ fn main() {
 }
 
 fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
+    // quitter
+    if engine.keyboard_state.just_pressed(KeyCode::Q) {
+        engine.should_exit = true;
+    }
+
+    // keep text fixed in window
+    let offset = ((engine.time_since_startup_f64 * 4.0).cos() * 5.0) as f32;
+    let score = engine.texts.get_mut("score").unwrap();
+    score.translation.x = engine.window_dimensions.x / 2.0 - 100.0;
+    score.translation.y = engine.window_dimensions.y / 2.0 - 50.0 + offset;
+    let high_score = engine.texts.get_mut("high_score").unwrap();
+    high_score.translation.x = -1.0 * (engine.window_dimensions.x / 2.0) + 100.0;
+    high_score.translation.y = engine.window_dimensions.y / 2.0 - 50.0;
+
     // engine.show_colliders = true;
     for event in engine.collision_events.drain(..) {
         // println!("{:?}", event);
@@ -67,7 +81,7 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
                 high_score.value = format!("High Score: {}", game_state.high_score);
             }
 
-            engine.audio_manager.play_sfx("sfx/impact1.ogg", 0.3);
+            engine.audio_manager.play_sfx("sfx/minimize2.ogg", 0.3);
         }
     }
 
@@ -121,6 +135,7 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
             thread_rng().gen_range(-325.0..325.0),
         );
         barrieri.collision = true;
+        engine.audio_manager.play_sfx("sfx/impact1.ogg", 0.3);
     }
 
     // reset score
