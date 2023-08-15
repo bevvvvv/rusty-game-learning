@@ -1,0 +1,17 @@
+[package]
+name = "tutorial"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rusty_engine = "5.2.1"
+
+[profile.dev]
+opt-level = 3            # enables all optimizations
+debug = false            # disables debug info
+debug-assertions = false
+overflow-checks = false
+incremental = false      # diables incremental compilation
+codegen-units = 16       # number of workers for cargo
